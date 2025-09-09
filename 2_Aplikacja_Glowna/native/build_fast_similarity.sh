@@ -1,5 +1,5 @@
 #!/bin/sh
-# Kompilacja biblioteki szybkiego podobieństwa kosinusowego
+# Compile cosine similarity library.
 set -e
 
 DIR="$(cd "$(dirname "$0")" && pwd)"

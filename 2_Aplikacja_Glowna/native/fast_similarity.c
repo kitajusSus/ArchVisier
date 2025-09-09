@@ -4,8 +4,8 @@
 #include <cblas.h>
 #endif
 
-// Prosta i szybka implementacja cosinusowego podobieństwa dla wektorów
-// double i float z opcjonalnym użyciem BLAS
+// Simple and fast cosine similarity implementation for vectors
+// double and float with optional BLAS support
 
 double cosine_similarity(const double * restrict a, const double * restrict b, int n) {
 #ifdef USE_BLAS
