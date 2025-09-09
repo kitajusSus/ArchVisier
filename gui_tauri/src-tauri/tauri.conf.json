@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "build": {
+    "beforeDevCommand": "bunx vite dev",
+    "beforeBuildCommand": "bunx vite build",
+    "devPath": "http://localhost:5173",
+    "distDir": "dist"
+  },
+  "package": {
+    "productName": "Archiwizator",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "shell": {
+        "all": false,
+        "open": true
+      }
+    },
+    "windows": [
+      {
+        "title": "Archiwizator",
+        "width": 800,
+        "height": 600
+      }
+    ]
+  }
+}

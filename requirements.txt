@@ -1,0 +1,34 @@
+# Główne biblioteki aplikacji
+Pillow>=9.5.0
+opencv-python-headless>=4.8.0
+pandas>=2.0.0
+openpyxl>=3.1.2
+pdf2image>=1.16.3
+pytesseract>=0.3.10
+tk>=0.1.0
+python-Levenshtein>=0.25.0
+langdetect>=1.0.9
+cryptography>=42.0.0
+pydantic
+
+# Biblioteki dla Machine Learning (NER)
+spacy>=3.7.2
+spacy-transformers>=1.3.2
+
+# Biblioteki dla LLM (Phi-3 Mini)
+torch>=2.0.0
+transformers>=4.35.2
+accelerate>=0.20.3
+safetensors>=0.4.1
+sentencepiece>=0.1.99
+bitsandbytes>=0.41.0
+
+# Biblioteki do etykietowania i trenowania
+doccano-client
+
+# Biblioteki do analizy kontekstowej
+scikit-learn>=1.0.0
+numpy>=1.20.0
+
+# Biblioteka do tworzenia pliku .exe
+pyinstaller>=6.0.0

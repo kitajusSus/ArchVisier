@@ -1,0 +1,11 @@
+[package]
+name = "gui-tauri"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+tauri = { version = "1.5", features = ["shell-open"] }
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }

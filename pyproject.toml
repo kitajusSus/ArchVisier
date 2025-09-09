@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "archiwizator"
+version = "0.1.0"
+description = "Helper for archiving intern in IGG"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "Pillow>=9.5.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.2",
+    "python-Levenshtein>=0.25.0",
+    "langdetect>=1.0.9",
+    "cryptography>=42.0.0",
+    "pydantic>=1.10,<2.0",
+    "numpy>=1.20.0",
+    "pyinstaller>=6.0.0"
+]
+
+[project.optional-dependencies]
+ocr = [
+    "pytesseract>=0.3.10",
+    "pdf2image>=1.16.3",
+    "opencv-python-headless>=4.8.0"
+]
+gui = [
+    "tk>=0.1.0"
+]
+training = [
+    "spacy>=3.7.2",
+    "spacy-transformers>=1.3.2",
+    "torch>=2.0.0",
+    "transformers>=4.35.2",
+    "accelerate>=0.20.3",
+    "safetensors>=0.4.1",
+    "sentencepiece>=0.1.99",
+    "bitsandbytes>=0.41.0",
+    "doccano-client>=1.2.0",
+    "scikit-learn>=1.0.0"
+]
+
+[tool.setuptools]
+packages = ["archiwizator_core", "archiwizator_gui", "archiwizator_training"]
+
+[tool.setuptools.package-dir]
+archiwizator_core = "2_Aplikacja_Glowna"
+archiwizator_gui = "2_Aplikacja_Glowna/gui"
+archiwizator_training = "1_Narzedzia_Treningowe"
+
+[project.scripts]
+archiwizator-cli = "cli:main"

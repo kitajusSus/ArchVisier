@@ -1,0 +1,18 @@
+{
+  "tesseract_folder": "C:\\krzys\\archiwizacja-IGG-helper\\2_Aplikacja_Glowna\\tesseract",
+  "poppler_folder": "C:\\krzys\\archiwizacja-IGG-helper\\2_Aplikacja_Glowna\\poppler\\bin",
+  "ocr_language": "pol",
+  "ocr_psm": 3,
+  "ocr_oem": 3,
+  "gui_title": "Archiwizator v3.2 (Qt)",
+  "gui_width": 1000,
+  "gui_height": 700,
+  "theme": "light",
+  "panel_visible": true,
+  "default_output_subdir": "zarchiwizowane",
+  "ocr_dpi": 300,
+  "ocr_workers": 0,
+  "blur_kernel_size": 5,
+  "adaptive_threshold_block_size": 21,
+  "adaptive_threshold_c": 5
+}
