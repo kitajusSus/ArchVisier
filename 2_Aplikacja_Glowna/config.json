@@ -1,6 +1,6 @@
 {
-  "tesseract_folder": "C:\\krzys\\archiwizacja-IGG-helper\\2_Aplikacja_Glowna\\tesseract",
-  "poppler_folder": "C:\\krzys\\archiwizacja-IGG-helper\\2_Aplikacja_Glowna\\poppler\\bin",
+  "tesseract_folder": "tesseract",
+  "poppler_folder": "poppler\\bin",
   "ocr_language": "pol",
   "ocr_psm": 3,
   "ocr_oem": 3,
