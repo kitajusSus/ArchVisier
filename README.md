@@ -396,40 +396,6 @@ Archiwizator jest dystrybuowany na licencji Apache 2.0. Szczegóły znajdziesz w
 
 ---
 
-**Wsparcie techniczne:**
-W przypadku problemów technicznych, sugestii lub pytań, skontaktuj się z autorem projektu lub zgłoś problem poprzez [system issues](https://github.com/kitajusSus/archiwizacja-IGG-helper/issues) na GitHubie.
-```
-
-Ten plik README.md jest już gotowy do umieszczenia w Twoim projekcie. Zawiera kompletne informacje o aplikacji wraz z listą użytych technologii i ich licencji. Format Markdown jest kompatybilny z GitHub i będzie wyświetlany poprawnie w repozytorium projektu.
-
-## Standardy kodowania
-
-Projekt wykorzystuje następujące zasady stylu kodu:
-
-* Wszystkie funkcje i metody posiadają adnotacje typów zgodnie z PEP 484.
-* Docstringi są pisane w formacie Google i opisują argumenty oraz wartości zwracane.
-* Spójność typów jest weryfikowana lokalnie narzędziem ``mypy``.
-* Kod jest utrzymywany w stylu PEP 8.
-
-Ten plik README.md jest już gotowy do umieszczenia w Twoim projekcie. Zawiera kompletne informacje o aplikacji wraz z listą użytych technologii i ich licencji. Format Markdown jest kompatybilny z GitHub i będzie wyświetlany poprawnie w repozytorium projektu.
-
-## Polityka licencyjna
-
-Projekt korzysta wyłącznie z bibliotek o licencjach zgodnych z Apache 2.0 lub MIT.
-Pełna lista wykorzystywanych komponentów z ich licencjami znajduje się w pliku
-[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
-
-Aby zaktualizować zestawienie licencji, uruchom skrypt audytu:
-
-```bash
-scripts/audit_licenses.sh
-```
-
-Skrypt pobiera informacje o pakietach Python oraz zależnościach front-endu i
-uzupełnia plik `THIRD_PARTY_LICENSES.md` danymi o bibliotekach natywnych, takich
-jak Qt czy Tesseract. Po każdej aktualizacji zależności plik należy ponownie
-generować i dodać do repozytorium.
-
 ## Przewodnik dla deweloperów
 
 1. Utwórz i aktywuj środowisko wirtualne:
