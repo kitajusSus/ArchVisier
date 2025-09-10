@@ -1,16 +1,20 @@
 # Training Tools
 
-Collection of scripts that support preparing data and training the NER model used in the Archiwizator application.
+
+A set of scripts that assist with data preparation and training the NER model used in the Archiwizator application.
 
 ## PDF → TXT Conversion
 
-`konwertuj_pdf_do_txt.py` — converts PDF files to plain text in batch.
+`konwertuj_pdf_do_txt.py` — batch converts PDF files to plain text.
+
 
 ```bash
 python konwertuj_pdf_do_txt.py <pdf_folder> <txt_folder>
 ```
 
-## Generating Data from Spreadsheets
+
+## Generating data from spreadsheets
+
 
 `przygotuj_dane_z_rozpisek.py` — merges spreadsheet metadata with PDF content and creates a JSONL file for spaCy.
 
@@ -22,12 +26,16 @@ The resulting file is saved in `dane_wyjściowe_z_doccano/`.
 
 ## Model Training
 
-`trenuj_model.py` — converts Doccano data to spaCy format and launches the training process.
+
+`trenuj_model.py` — converts data from Doccano into spaCy format and starts the training process.
+
 
 ```bash
 python trenuj_model.py
 ```
 
-The trained model will be located in `model_wyjściowy/model-best/`.
 
-These scripts assume that Tesseract and Poppler are available in the `2_Aplikacja_Glowna` directory. Details of the process are described in [Dokumentacja_Techniczna.md](../Dokumentacja_Techniczna.md).
+The output model can be found in `model_wyjściowy/model-best/`.
+
+The scripts assume Tesseract and Poppler are present in the `2_Aplikacja_Glowna` directory. Detailed instructions are available in [Dokumentacja_Techniczna.md](../Dokumentacja_Techniczna.md).
+
