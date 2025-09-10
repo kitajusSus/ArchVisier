@@ -81,14 +81,14 @@ def resolve_default_url(system: str) -> str | None:
 
 
 def download_and_extract(url: str, dest: pathlib.Path) -> None:
-    print(f"Pobieranie {url} ...")
+    print(f"Downloading {url} ...")
     try:
         with urlopen(url) as response:
             data = response.read()
     except HTTPError as e:
-        raise SystemExit(f"Błąd pobierania {url}: {e.code} {e.reason}")
+        raise SystemExit(f"Download error {url}: {e.code} {e.reason}")
     except URLError as e:
-        raise SystemExit(f"Błąd pobierania {url}: {e.reason}")
+        raise SystemExit(f"Download error {url}: {e.reason}")
     dest.mkdir(parents=True, exist_ok=True)
     buffer = io.BytesIO(data)
     if url.endswith(".zip"):
@@ -98,8 +98,8 @@ def download_and_extract(url: str, dest: pathlib.Path) -> None:
         with tarfile.open(fileobj=buffer) as tf:
             tf.extractall(dest)
     else:
-        raise RuntimeError(f"Nieobsługiwany format archiwum: {url}")
-    print(f"Rozpakowano do {dest}")
+        raise RuntimeError(f"Unsupported archive format: {url}")
+    print(f"Extracted to {dest}")
 
 
 def main() -> None:
@@ -116,8 +116,7 @@ def main() -> None:
 
     if not args.url:
         raise SystemExit(
-
-            f"Brak zdefiniowanego URL dla platformy {system}. Użyj --url, aby podać ręcznie."
+            f"No URL defined for platform {system}. Use --url to provide one manually."
         )
     download_and_extract(args.url, DEST)
 

@@ -25,6 +25,7 @@ from typing import Iterable, List
 
 float32 = "float32"
 float64 = "float64"
+bool_ = bool
 
 
 class _CtypesWrapper:
@@ -128,15 +129,21 @@ class _RandomModule:
 random = _RandomModule()
 
 
+def isscalar(obj) -> bool:  # pragma: no cover - trivial helper
+    return not isinstance(obj, (list, tuple, dict, ndarray))
+
+
 __all__ = [
     "array",
     "asarray",
     "dot",
     "float32",
     "float64",
+    "bool_",
     "linalg",
     "random",
     "ndarray",
+    "isscalar",
 ]
 
 

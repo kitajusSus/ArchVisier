@@ -66,6 +66,6 @@ def test_compile_cpp_missing_header(monkeypatch, tmp_path, capsys):
 
     compile_cpp()
     captured = capsys.readouterr()
-    assert "Brak kompletnej instalacji Tesseract" in captured.out
-    assert "Pomiń kompilację" in captured.out
+    assert "Incomplete Tesseract installation" in captured.out
+    assert "Skip compilation" in captured.out
     assert "url" in called

@@ -36,19 +36,19 @@ def check_tool(tool_name: str) -> None:
         try:
             importlib.import_module("PyInstaller")
         except ModuleNotFoundError:
-            print("Brak narzędzia 'pyinstaller' w systemie.")
-            print("Zainstaluj PyInstaller: pip install pyinstaller")
+            print("Tool 'pyinstaller' is missing.")
+            print("Install PyInstaller: pip install pyinstaller")
             sys.exit(1)
         return
 
     if shutil.which(tool_name) is None:
-        print(f"Brak narzędzia '{tool_name}' w systemie.")
+        print(f"Tool '{tool_name}' is missing.")
         if tool_name == "zig":
-            print("Zainstaluj zig: https://ziglang.org/download/")
+            print("Install zig: https://ziglang.org/download/")
         elif tool_name.startswith("clang"):
-            print("Zainstaluj clang: https://clang.llvm.org/")
+            print("Install clang: https://clang.llvm.org/")
         elif tool_name == "cl":
-            print("Uruchom wiersz poleceń Visual Studio lub zainstaluj MSVC.")
+            print("Run Visual Studio command prompt or install MSVC.")
         sys.exit(1)
 
 
@@ -57,9 +57,9 @@ def check_resource(path: pathlib.Path) -> bool:
     missing = [name for name in ("tesseract", "poppler") if not (path / name).exists()]
     if missing:
         print(
-            "Brak wymaganych katalogów: "
+            "Missing required directories: "
             + ", ".join(missing)
-            + f" w {path}."
+            + f" in {path}."
         )
         return False
     return True
@@ -100,12 +100,12 @@ def compile_cpp(compiler: str = "zig") -> None:
         tess_lib, lept_lib = find_libs()
         if include_dir.exists() and header.exists() and tess_lib and lept_lib:
             return tess_lib, lept_lib
-        print("Brak kompletnej instalacji Tesseract. Próba pobrania...")
+        print("Incomplete Tesseract installation. Attempting download...")
         system = platform.system().lower()
         url = DEFAULT_URLS.get(system)
         if not url:
             print(
-                f"Brak domyślnego URL dla platformy {system}. Uruchom 'fetch_tesseract.py --url <adres>' ręcznie."
+                f"No default URL for platform {system}. Run 'fetch_tesseract.py --url <address>' manually."
             )
             return None, None
         download_and_extract(url, tesseract_dir)
@@ -114,14 +114,14 @@ def compile_cpp(compiler: str = "zig") -> None:
         tess_lib, lept_lib = find_libs()
         if include_dir.exists() and header.exists() and tess_lib and lept_lib:
             return tess_lib, lept_lib
-        print("Brak plików .lib bibliotek Tesseract i Leptonica.")
+        print("Missing .lib files for Tesseract and Leptonica libraries.")
         return None, None
 
     tess_lib, lept_lib = ensure_tesseract()
     include_dir = tesseract_dir / "include"
     header = include_dir / "tesseract" / "version.h"
     if not include_dir.exists() or not header.exists():
-        print("Pomiń kompilację lub doinstaluj pakiet deweloperski Tesseract.")
+        print("Skip compilation or install the Tesseract developer package.")
         return
 
     include_args = [f"-I{include_dir}"]
@@ -153,7 +153,7 @@ def compile_cpp(compiler: str = "zig") -> None:
                     str(lept_lib),
                 ]
             else:
-                print("Brak wymaganych bibliotek Tesseract i Leptonica.")
+                print("Missing required Tesseract and Leptonica libraries.")
                 return
 
     env = os.environ.copy()
@@ -214,7 +214,7 @@ def compile_cpp(compiler: str = "zig") -> None:
         if lib_dirs:
             cmd += ["/link", *[f"/LIBPATH:{d}" for d in lib_dirs]]
     else:
-        raise ValueError(f"Nieobsługiwany kompilator: {compiler}")
+        raise ValueError(f"Unsupported compiler: {compiler}")
 
     try:
         run(cmd, env=env)
@@ -253,7 +253,7 @@ def build_fast_similarity(compiler: str = "zig") -> None:
     elif compiler in {"clang-cl", "cl"}:
         cmd = [compiler, "/O2", "/LD", str(src), f"/Fe:{out}"]
     else:
-        raise ValueError(f"Nieobsługiwany kompilator: {compiler}")
+        raise ValueError(f"Unsupported compiler: {compiler}")
 
     run(cmd)
 
@@ -281,7 +281,7 @@ def copy_resources() -> None:
     """Copy additional resources to distribution directory."""
     dist = ROOT / "dist" / "Archiwizator"
     if not dist.exists():
-        print("Brak folderu dist/Archiwizator.")
+        print("dist/Archiwizator directory is missing.")
         return
 
     # Copy similarity library
@@ -310,10 +310,10 @@ def copy_resources() -> None:
 def copy_licenses() -> None:
     dist = ROOT / "dist" / "Archiwizator"
     if not dist.exists():
-        print("Brak folderu dist/Archiwizator.")
+        print("dist/Archiwizator directory is missing.")
         return
     if not check_resource(dist):
-        print("Brakuje zasobów, kopiowanie licencji przerwane.")
+        print("Resources missing, license copy aborted.")
         sys.exit(1)
     shutil.copy(ROOT / "LICENSE", dist / "LICENSE")
     tess_license = SRC / "tesseract" / "doc" / "LICENSE"
@@ -340,7 +340,7 @@ def main() -> None:
         "--compiler",
         choices=["zig", "clang++", "clang-cl", "cl"],
         default=default_compiler,
-        help="Kompilator używany do budowania komponentów C/C++",
+        help="Compiler used to build C/C++ components",
     )
     args = parser.parse_args()
 
@@ -358,7 +358,7 @@ def main() -> None:
     if mode == "onedir":
         copy_resources()
         copy_licenses()
-    print("Gotowe. Pliki w dist/Archiwizator/")
+    print("Done. Files in dist/Archiwizator/")
 
 
 if __name__ == "__main__":

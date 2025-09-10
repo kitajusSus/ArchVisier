@@ -18,14 +18,14 @@ def run_process_command(pdf_paths: List[str], language: str) -> None:
     )
     for path, result in zip(pdf_paths, results):
         if result is None:
-            print(f"{path}: brak wyniku")
+            print(f"{path}: no result")
             continue
         text, status = result
         print(f"== {path} ==")
         print(status)
         if text:
             print(text)
-    print(f"Przetworzono stron: {total_pages}")
+    print(f"Pages processed: {total_pages}")
 
 
 def main() -> None:
@@ -33,17 +33,17 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command")
 
     process_parser = subparsers.add_parser(
-        "process", help="Wykonaj OCR na plikach PDF"
+        "process", help="Run OCR on PDF files"
     )
     process_parser.add_argument(
-        "pdf_paths", nargs="+", help="Ścieżki do plików PDF do przetworzenia"
+        "pdf_paths", nargs="+", help="Paths to PDF files to process"
     )
     process_parser.add_argument(
         "-l",
         "--language",
         default="pol",
         choices=["pol", "eng", "auto"],
-        help="Język OCR (pol, eng, auto)",
+        help="OCR language (pol, eng, auto)",
     )
 
     args = parser.parse_args()
