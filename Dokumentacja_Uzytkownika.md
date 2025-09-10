@@ -1,3 +1,4 @@
+
 # Archiwizator – User Guide
 
 ## 1. Introduction
@@ -14,6 +15,7 @@ The application is distributed as an `Archiwizator.exe` file and requires no ins
 
 1. Install [Python 3.11+](https://www.python.org/downloads/), [Git](https://git-scm.com/) and [Zig](https://ziglang.org/download/).
 2. Clone the repository and set up the environment:
+
    ```bash
    git clone https://github.com/kitajusSus/archiwizacja-IGG-helper.git
    cd archiwizacja-IGG-helper
@@ -21,17 +23,20 @@ The application is distributed as an `Archiwizator.exe` file and requires no ins
    venv\\Scripts\\activate
    pip install -r requirements.txt
    ```
+
 3. (Optional) Install `bitsandbytes` if you plan to use the text assistant mode:
    ```bash
    pip install bitsandbytes
    ```
 4. Build the native components and prepare the distribution package:
+
    ```bash
    cd 2_Aplikacja_Glowna
    zig cc -O3 -shared fast_similarity.c -o fast_similarity.dll
    cd ..
    python build_exe.py
    ```
+
    The `dist/Archiwizator` folder will contain `Archiwizator.exe` along with the required resources.
 
 ## 3. Main Application Window
@@ -44,9 +49,23 @@ After launching the program, the main window is divided into several sections:
 4. **Results:** A table where processed documents appear. You can verify and correct data before saving.
 5. **Saving and Exporting:** Buttons to finalize your work.
 
+   The resulting `dist/Archiwizator` directory contains `Archiwizator.exe` along with required resources.
+
+## 3. Main Application Window
+
+After launching, you will see the main program window consisting of several sections:
+
+1.  **Operating mode:** Select the type of documents you want to organize.
+2.  **Input data:** Specify where the input PDFs are located and where to save the results.
+3.  **Actions:** The main button for starting the analysis.
+4.  **Results:** A table displaying processed documents. Here you can verify and edit data before final saving.
+5.  **Save and Export:** Buttons for completing your work.
+
+
 ## 4. Using the Application Step by Step
 
 ### Step 1: Choose the operating mode
+
 
 At the top, choose the mode that matches your task:
 * **Incoming/Outgoing Correspondence:** Use this mode for standard letters, invoices, contracts, etc.
@@ -96,4 +115,5 @@ You can use both options: first export the spreadsheet, then save and move the f
 **Thank you for using Archiwizator!**
 
 Developers who want to extend the application can find additional guidance in [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+
 
