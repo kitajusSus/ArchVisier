@@ -1,4 +1,4 @@
-"""Trening modelu NER spaCy na podstawie eksportu z Doccano."""
+"""Train a spaCy NER model using data exported from Doccano."""
 
 import json
 import os
@@ -34,17 +34,17 @@ def convert_doccano_to_spacy(input_path: str, output_path: str) -> None:
         for start, end, label in item["label"]:
             span = doc.char_span(start, end, label=label)
             if span is None:
-                print(f"Pominięto encję (problem z dopasowaniem): '{text[start:end]}'")
+                print(f"Skipped entity (alignment issue): '{text[start:end]}'")
             else:
                 ents.append(span)
         try:
             doc.ents = ents
             db.add(doc)
         except ValueError as e:
-            print(f"Błąd przy ustawianiu encji dla dokumentu: {text[:50]}... - {e}")
+            print(f"Error setting entities for document: {text[:50]}... - {e}")
 
     db.to_disk(output_path)
-    print(f"Pomyślnie przekonwertowano dane do formatu spaCy: {output_path}")
+    print(f"Successfully converted data to spaCy format: {output_path}")
 
 
 def main() -> None:
@@ -57,11 +57,11 @@ def main() -> None:
 
     jsonl_files = [f for f in os.listdir(doccano_output_dir) if f.endswith(".jsonl")]
     if not jsonl_files:
-        print(f"Błąd: Nie znaleziono plików .jsonl w '{doccano_output_dir}'.")
+        print(f"Error: No .jsonl files found in '{doccano_output_dir}'.")
         return
 
     doccano_file = os.path.join(doccano_output_dir, jsonl_files[0])
-    print(f"Używam pliku z danymi: {doccano_file}")
+    print(f"Using data file: {doccano_file}")
 
     if not os.path.exists(training_data_dir):
         os.makedirs(training_data_dir)
@@ -85,7 +85,7 @@ def main() -> None:
     os.remove("dev.jsonl")
 
     if not os.path.exists(config_path):
-        print("Generowanie pliku konfiguracyjnego `config.cfg`...")
+        print("Generating configuration file `config.cfg`...")
         try:
             subprocess.run(
                 [
@@ -103,10 +103,10 @@ def main() -> None:
             )
         except subprocess.CalledProcessError as e:
             err = (e.stderr or e.stdout).strip()
-            print(f"Błąd podczas generowania pliku konfiguracyjnego: {err}")
+            print(f"Error generating configuration file: {err}")
             sys.exit(1)
 
-    print("\nRozpoczynanie treningu modelu spaCy...")
+    print("\nStarting spaCy model training...")
     train(
         config_path,
         model_output_dir,
@@ -116,7 +116,7 @@ def main() -> None:
         },
     )
     print(
-        f"\nTrening zakończony! Najlepszy model zapisano w: {os.path.join(model_output_dir, 'model-best')}"
+        f"\nTraining complete! Best model saved to: {os.path.join(model_output_dir, 'model-best')}"
     )
 
 

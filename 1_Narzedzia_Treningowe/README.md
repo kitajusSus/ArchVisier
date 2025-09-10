@@ -1,33 +1,33 @@
-# Narzędzia Treningowe
+# Training Tools
 
-Zbiór skryptów wspierających przygotowanie danych i trenowanie modelu NER wykorzystywanego w aplikacji Archiwizator.
+Collection of scripts that support preparing data and training the NER model used in the Archiwizator application.
 
-## Konwersja PDF → TXT
+## PDF → TXT Conversion
 
-`konwertuj_pdf_do_txt.py` — masowo przetwarza pliki PDF na zwykły tekst.
-
-```bash
-python konwertuj_pdf_do_txt.py <folder_z_pdfami> <folder_na_txt>
-```
-
-## Generowanie danych z rozpisek
-
-`przygotuj_dane_z_rozpisek.py` — łączy metadane z arkuszy kalkulacyjnych z treścią PDF i tworzy plik JSONL dla spaCy.
+`konwertuj_pdf_do_txt.py` — converts PDF files to plain text in batch.
 
 ```bash
-python przygotuj_dane_z_rozpisek.py <katalog_z_rozpiskami>
+python konwertuj_pdf_do_txt.py <pdf_folder> <txt_folder>
 ```
 
-Wynikowy plik zostaje zapisany w `dane_wyjściowe_z_doccano/`.
+## Generating Data from Spreadsheets
 
-## Trening modelu
+`przygotuj_dane_z_rozpisek.py` — merges spreadsheet metadata with PDF content and creates a JSONL file for spaCy.
 
-`trenuj_model.py` — konwertuje dane z Doccano na format spaCy i uruchamia proces trenowania.
+```bash
+python przygotuj_dane_z_rozpisek.py <spreadsheets_folder>
+```
+
+The resulting file is saved in `dane_wyjściowe_z_doccano/`.
+
+## Model Training
+
+`trenuj_model.py` — converts Doccano data to spaCy format and launches the training process.
 
 ```bash
 python trenuj_model.py
 ```
 
-Model wyjściowy znajdziesz w katalogu `model_wyjściowy/model-best/`.
+The trained model will be located in `model_wyjściowy/model-best/`.
 
-Skrypty zakładają obecność Tesseract i Popplera w katalogu `2_Aplikacja_Glowna`. Szczegóły procesu opisano w [Dokumentacja_Techniczna.md](../Dokumentacja_Techniczna.md).
+These scripts assume that Tesseract and Poppler are available in the `2_Aplikacja_Glowna` directory. Details of the process are described in [Dokumentacja_Techniczna.md](../Dokumentacja_Techniczna.md).

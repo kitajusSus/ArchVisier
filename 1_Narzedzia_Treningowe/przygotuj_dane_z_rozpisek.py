@@ -1,4 +1,4 @@
-"""Generowanie danych treningowych NER na podstawie rozpisek i plików PDF."""
+"""Generate NER training data from spreadsheets and PDF files."""
 
 import os
 import sys
@@ -11,8 +11,8 @@ import traceback
 from pdf2image import convert_from_path
 import pytesseract
 
-# --- Konfiguracja Ścieżek ---
-# Zakładamy, że Tesseract i Poppler są w folderze z aplikacją główną
+# --- Path Configuration ---
+# Assume Tesseract and Poppler are in the main application folder
 base_app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '2_Aplikacja_Główna'))
 tesseract_folder = os.path.join(base_app_path, "tesseract")
 poppler_folder = os.path.join(base_app_path, "poppler", "bin")
@@ -23,21 +23,21 @@ if os.path.exists(tesseract_cmd):
 if not os.path.isdir(poppler_folder):
     poppler_folder = None
 
-# --- Konfiguracja Mapowania Kolumn ---
-# Dostosuj nazwy kolumn w Twoim Excelu do etykiet, których ma się uczyć model
-# Klucz: Nazwa kolumny w pliku XLSX (wielkość liter ma znaczenie!)
-# Wartość: Etykieta, którą ma rozpoznać model spaCy
+# --- Column Mapping Configuration ---
+# Adjust your Excel column names to the labels the model should learn
+# Key: Column name in the XLSX file (case-sensitive!)
+# Value: Label that the spaCy model should recognize
 KOLUMNY_MAPOWANIE = {
     "Data": "DATA",
     "Nadawca": "ORGANIZACJA",
-    "Odbiorca": "ORGANIZACJA", # Nadawca i Odbiorca to ta sama kategoria dla modelu
+    "Odbiorca": "ORGANIZACJA",  # Sender and Recipient are the same category for the model
     "W sprawie": "TYTUL_PISMA",
     "Numer Dokumentu": "NR_DOKUMENTU",
     "Sygnatura Sprawy": "SYGNATURA_SPRAWY",
-    # Dodaj tutaj inne mapowania, jeśli potrzebujesz
+    # Add more mappings here if needed
 }
 
-# Nazwa kolumny w Excelu, która zawiera nazwę pliku PDF
+# Name of the Excel column containing the PDF file name
 KOLUMNA_Z_NAZWA_PLIKU = "Nazwa Pliku"
 
 def find_all_occurrences(text: str, sub: str) -> Iterator[int]:
@@ -71,18 +71,18 @@ def process_directory(input_dir: str, output_file: str) -> None:
     training_data: list[dict[str, object]] = []
 
     for root, _, files in os.walk(input_dir):
-        # Szukamy pliku Excel w bieżącym folderze
+        # Look for an Excel file in the current folder
         xlsx_files = [f for f in files if f.lower().endswith('.xlsx')]
         if not xlsx_files:
-            continue  # Przechodzimy do następnego folderu, jeśli nie ma tu rozpiski
+            continue  # Skip to the next folder if no spreadsheet is found
 
         xlsx_path = os.path.join(root, xlsx_files[0])
-        print(f"\n--- Przetwarzanie rozpiski: {xlsx_path} ---")
+        print(f"\n--- Processing spreadsheet: {xlsx_path} ---")
 
         try:
             df = pd.read_excel(xlsx_path)
         except Exception as e:
-            print(f"!! Błąd odczytu pliku Excel: {e}")
+            print(f"!! Error reading Excel file: {e}")
             continue
 
         for _, row in df.iterrows():
@@ -92,21 +92,21 @@ def process_directory(input_dir: str, output_file: str) -> None:
 
             pdf_path = os.path.join(root, pdf_filename)
             if not os.path.exists(pdf_path):
-                print(f"!! Ostrzeżenie: Plik PDF '{pdf_filename}' nie został znaleziony.")
+                print(f"!! Warning: PDF file '{pdf_filename}' not found.")
                 continue
 
-            print(f"  -> Przetwarzanie pliku: {pdf_filename}")
+            print(f"  -> Processing file: {pdf_filename}")
 
-            # Krok 1: OCR - odczytanie pełnej treści PDF
+            # Step 1: OCR – read full PDF content
             try:
                 images = convert_from_path(pdf_path, 300, poppler_path=poppler_folder)
                 full_text = "".join(pytesseract.image_to_string(img, lang='pol') for img in images)
             except Exception as e:
-                print(f"  !! Błąd OCR dla pliku {pdf_filename}: {e}")
+                print(f"  !! OCR error for file {pdf_filename}: {e}")
                 traceback.print_exc()
                 continue
 
-            # Krok 2: Wyszukiwanie metadanych z Excela w tekście z OCR
+            # Step 2: Search for Excel metadata in OCR text
             entities: list[list[object]] = []
             for col_name, label in KOLUMNY_MAPOWANIE.items():
                 if col_name in row and pd.notna(row[col_name]):
@@ -117,30 +117,30 @@ def process_directory(input_dir: str, output_file: str) -> None:
                     for start_index in find_all_occurrences(full_text, metadata_text):
                         end_index = start_index + len(metadata_text)
                         entities.append([start_index, end_index, label])
-                        print(f"    Znaleziono etykietę '{label}': '{metadata_text}'")
+                        print(f"    Found label '{label}': '{metadata_text}'")
 
             if entities:
                 training_data.append({"text": full_text, "label": entities})
 
-    # Zapisz dane treningowe do pliku JSONL
+    # Save training data to a JSONL file
     with open(output_file, 'w', encoding='utf-8') as f:
         for entry in training_data:
             json.dump(entry, f, ensure_ascii=False)
             f.write('\n')
-    print(f"\n>>> Zakończono! Zapisano {len(training_data)} rekordów treningowych do pliku: {output_file}")
+    print(f"\n>>> Done! Saved {len(training_data)} training records to file: {output_file}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Użycie: python przygotuj_dane_z_rozpisek.py <folder_z_danymi_treningowymi>")
-        print("\nPrzykład: python przygotuj_dane_z_rozpisek.py \"C:\\Moje Dokumenty\\Stare Archiwum\"")
+        print("Usage: python przygotuj_dane_z_rozpisek.py <training_data_folder>")
+        print("\nExample: python przygotuj_dane_z_rozpisek.py \"C:/My Documents/Old Archive\"")
         sys.exit(1)
 
     input_data_folder = sys.argv[1]
     output_jsonl_file = os.path.join("dane_wyjściowe_z_doccano", "trening_z_rozpisek.jsonl")
 
     if not os.path.isdir(input_data_folder):
-        print(f"Błąd: Folder wejściowy '{input_data_folder}' nie istnieje.")
+        print(f"Error: Input folder '{input_data_folder}' does not exist.")
         sys.exit(1)
         
     if not os.path.exists("dane_wyjściowe_z_doccano"):
