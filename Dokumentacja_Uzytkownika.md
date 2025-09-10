@@ -1,19 +1,19 @@
-# Archiwizator - Dokumentacja Użytkownika
+# Archiwizator – User Guide
 
-## 1. Wprowadzenie
+## 1. Introduction
 
-Witaj w instrukcji obsługi aplikacji **Archiwizator**. Ten program został stworzony, aby pomóc Ci w szybkim i zorganizowanym porządkowaniu skanów dokumentów. Aplikacja "czyta" pliki PDF, a następnie automatycznie je nazywa i sortuje na podstawie odnalezionych informacji.
+Welcome to the user manual for **Archiwizator**. This program helps you quickly and neatly organize scanned documents. The application reads PDF files and automatically names and sorts them based on the information it finds.
 
-## 2. Instalacja i uruchomienie
+## 2. Installation and Launch
 
-### 2.1 Uruchomienie gotowej paczki
+### 2.1 Launching the packaged version
 
-Aplikacja jest dostarczana jako plik `Archiwizator.exe` i nie wymaga instalacji. Wystarczy skopiować go w dogodne miejsce i uruchomić dwuklikiem.
+The application is distributed as an `Archiwizator.exe` file and requires no installation. Simply copy it to a convenient location and double-click to run.
 
-### 2.2 Budowa własnej paczki (dla zaawansowanych)
+### 2.2 Building your own package (advanced)
 
-1. Zainstaluj [Python 3.11+](https://www.python.org/downloads/), [Git](https://git-scm.com/) oraz [Zig](https://ziglang.org/download/).
-2. Sklonuj repozytorium i przygotuj środowisko:
+1. Install [Python 3.11+](https://www.python.org/downloads/), [Git](https://git-scm.com/) and [Zig](https://ziglang.org/download/).
+2. Clone the repository and set up the environment:
    ```bash
    git clone https://github.com/kitajusSus/archiwizacja-IGG-helper.git
    cd archiwizacja-IGG-helper
@@ -21,79 +21,79 @@ Aplikacja jest dostarczana jako plik `Archiwizator.exe` i nie wymaga instalacji.
    venv\\Scripts\\activate
    pip install -r requirements.txt
    ```
-3. (Opcjonalnie) zainstaluj `bitsandbytes`, jeśli planujesz korzystać z trybu asystenta tekstowego:
+3. (Optional) Install `bitsandbytes` if you plan to use the text assistant mode:
    ```bash
    pip install bitsandbytes
    ```
-4. Zbuduj komponenty natywne i przygotuj pakiet dystrybucyjny:
+4. Build the native components and prepare the distribution package:
    ```bash
    cd 2_Aplikacja_Glowna
    zig cc -O3 -shared fast_similarity.c -o fast_similarity.dll
    cd ..
    python build_exe.py
    ```
-   Gotowy katalog `dist/Archiwizator` zawiera plik `Archiwizator.exe` wraz z wymaganymi zasobami.
+   The `dist/Archiwizator` folder will contain `Archiwizator.exe` along with the required resources.
 
-## 3. Główne Okno Aplikacji
+## 3. Main Application Window
 
-Po uruchomieniu zobaczysz główne okno programu, które składa się z kilku sekcji:
+After launching the program, the main window is divided into several sections:
 
-1.  **Tryb pracy:** Tutaj wybierasz, jaki rodzaj dokumentów będziesz porządkować.
-2.  **Dane wejściowe:** W tym miejscu wskazujesz programowi, gdzie znajdują się pliki do przetworzenia i gdzie zapisać wyniki.
-3.  **Akcje:** Główny przycisk do uruchamiania analizy.
-4.  **Wyniki:** Tabela, w której pojawią się przetworzone dokumenty. Możesz tu zweryfikować i poprawić dane przed finalnym zapisem.
-5.  **Zapis i Eksport:** Przyciski do finalizowania pracy.
+1. **Operating mode:** Choose what type of documents you want to organize.
+2. **Input data:** Point the program to the folder with files to process and where to save the results.
+3. **Actions:** The main button for starting the analysis.
+4. **Results:** A table where processed documents appear. You can verify and correct data before saving.
+5. **Saving and Exporting:** Buttons to finalize your work.
 
-## 4. Praca z Aplikacją Krok po Kroku
+## 4. Using the Application Step by Step
 
-### Krok 1: Wybierz tryb pracy
+### Step 1: Choose the operating mode
 
-Na samej górze wybierz jedną z trzech opcji, w zależności od zadania:
-*   **Korespondencja Przychodząca / Wychodząca:** Użyj tego trybu dla standardowych pism, faktur, umów itp.
-*   **Sąd Arbitrażowy:** Ten tryb jest specjalnie przystosowany do pracy z dokumentami w ramach jednej sprawy sądowej.
+At the top, choose the mode that matches your task:
+* **Incoming/Outgoing Correspondence:** Use this mode for standard letters, invoices, contracts, etc.
+* **Arbitration Court:** Tailored for documents related to a single court case.
 
-### Krok 2: Wskaż dane wejściowe
+### Step 2: Specify input data
 
-*   **Jeśli wybrałeś tryb "Sąd Arbitrażowy":**
-    1.  Pojawi się dodatkowe pole **"Sygnatura Akt Sprawy"**. Wpisz tutaj sygnaturę sprawy, którą się zajmujesz (np. `I C 123/23`). Jest to kluczowe, aby wszystkie dokumenty trafiły do jednego folderu.
-*   **Dla wszystkich trybów:**
-    1.  **Folder ze skanami PDF:** Kliknij "Wybierz..." i wskaż folder, w którym znajdują się pliki PDF do uporządkowania.
-    2.  **Folder na wyniki:** Kliknij "Wybierz..." i wskaż folder, gdzie program ma zapisać posortowane i poprawnie nazwane pliki.
+* **If you selected “Arbitration Court”:**
+  1. An additional **“Case Number”** field will appear. Enter the case number you are working on (e.g., `I C 123/23`). This ensures all documents go into a single folder.
+* **For all modes:**
+  1. **Folder with PDF scans:** Click “Choose...” and select the folder containing the PDF files to organize.
+  2. **Output folder:** Click “Choose...” and select the folder where the program should save the sorted and properly named files.
 
-### Krok 3: Skanuj i analizuj
+### Step 3: Scan and analyze
 
-Kliknij duży przycisk **"3. Skanuj pliki i analizuj"**. Program rozpocznie pracę, a pasek postępu pokaże, na jakim jest etapie. Może to potrwać kilka minut, w zależności od liczby i złożoności dokumentów.
+Click the large **“3. Scan files and analyze”** button. The program will start working, and the progress bar will show its current stage. This may take several minutes depending on the number and complexity of the documents.
 
-### Krok 4: Weryfikuj i edytuj dane
+### Step 4: Verify and edit data
 
-Po zakończeniu analizy, w dolnej tabeli pojawią się wyniki. Każdy wiersz to jeden dokument.
-*   **Sprawdź poprawność danych:** Zobacz, czy program dobrze rozpoznał datę, nadawcę, tytuł pisma itp.
-*   **Edytuj w razie potrzeby:** Jeśli jakaś informacja jest błędna, **kliknij na nią dwukrotnie**. Otworzy się małe okienko, w którym możesz wpisać poprawną wartość. Po zapisaniu, nowa nazwa pliku zostanie automatycznie zaktualizowana.
-*   **Zwróć uwagę na błędy:** Jeśli cały wiersz jest podświetlony na różowo, oznacza to, że wystąpił błąd podczas odczytu pliku PDF. Taki plik należy zweryfikować ręcznie.
+After the analysis finishes, the results appear in the table at the bottom. Each row represents one document.
+* **Check the data:** Ensure the program correctly recognized the date, sender, document title, etc.
+* **Edit if necessary:** If something is incorrect, **double-click** the field. A small window opens where you can enter the correct value. After saving, the filename updates automatically.
+* **Watch for errors:** If an entire row is highlighted in pink, an error occurred while reading the PDF. Such files should be checked manually.
 
-### Krok 5: Zapisz wyniki LUB wyeksportuj rozpiskę
+### Step 5: Save the results OR export a spreadsheet
 
-Gdy dane w tabeli są już poprawne, masz dwie możliwości:
+When the data in the table is correct, you have two options:
 
-*   **Opcja A: Zapisz zmiany i przenieś pliki**
-    *   Kliknij ten przycisk, aby fizycznie uporządkować pliki. Program skopiuje je do folderu docelowego, nadając im nowe nazwy i tworząc podfoldery (w trybie sądowym).
-    *   Użyj tej opcji, aby sfinalizować archiwizację.
+* **Option A: Save changes and move files**
+    * Click this button to physically organize the files. The program copies them to the destination folder, gives them new names and creates subfolders (in court mode).
+    * Use this option to finalize archiving.
+* **Option B: Export the view to Excel**
+    * Click this button to create an `.xlsx` file containing exactly what you see in the table.
+    * The program will ask for a location and filename for the Excel file.
+    * Use this option if you need a report or list of documents without moving the files themselves.
 
-*   **Opcja B: Eksportuj widok do Excela**
-    *   Kliknij ten przycisk, aby stworzyć plik `.xlsx` (rozpiskę) zawierający dokładnie to, co widzisz w tabeli.
-    *   Program poprosi o wskazanie miejsca i nazwy dla pliku Excel.
-    *   Użyj tej opcji, jeśli potrzebujesz raportu lub spisu dokumentów bez przenoszenia samych plików.
+You can use both options: first export the spreadsheet, then save and move the files.
 
-Możesz użyć obu opcji - najpierw wyeksportować rozpiskę, a następnie zapisać i przenieść pliki.
+**Done! Your documents are now organized and the spreadsheet has been generated.**
 
-**Gotowe! Twoje dokumenty są teraz uporządkowane, a rozpiska wygenerowana.**
+## 5. Additional Tips and Support
 
-## 5. Dodatkowe wskazówki i wsparcie
+- Make sure the document scans are of good quality; this improves OCR accuracy.
+- If you encounter issues, consult the [Troubleshooting](README.md#troubleshooting) section of the README.
+- Report bugs or suggestions through the [issue tracker](https://github.com/kitajusSus/archiwizacja-IGG-helper/issues).
 
-- Upewnij się, że skany dokumentów są dobrej jakości – ułatwia to skuteczność OCR.
-- W przypadku problemów skorzystaj z sekcji rozwiązywania problemów w pliku `README.md`.
-- Błędy lub sugestie zgłaszaj poprzez [system issues](https://github.com/kitajusSus/archiwizacja-IGG-helper/issues).
+**Thank you for using Archiwizator!**
 
-**Dziękujemy za korzystanie z Archiwizatora!**
+Developers who want to extend the application can find additional guidance in [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Dla deweloperów chcących rozwijać aplikację przygotowano oddzielny przewodnik w plikach [README.md](README.md) oraz [CONTRIBUTING.md](CONTRIBUTING.md).
