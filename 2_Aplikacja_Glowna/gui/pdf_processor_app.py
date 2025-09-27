@@ -393,6 +393,12 @@ class PdfProcessorApp(QtWidgets.QMainWindow, SessionManagerUI):
         self.validate_btn.clicked.connect(self._validate_current_row)
         panel_layout.addWidget(self.validate_btn)
 
+
+
+        self.rename_btn = QtWidgets.QPushButton("Zmień nazwy")
+        self.rename_btn.clicked.connect(self._apply_new_names)
+        panel_layout.addWidget(self.rename_btn)
+
         panel_layout.addStretch(1)
 
         self.main_splitter.addWidget(self.side_panel)
@@ -750,6 +756,8 @@ class PdfProcessorApp(QtWidgets.QMainWindow, SessionManagerUI):
             full_path = os.path.join(self.input_dir, name)
             try:
                 name_item.setData(QtCore.Qt.UserRole, full_path)
+                name_item.setData(QtCore.Qt.UserRole + 1, new_name)
+                new_item.setData(QtCore.Qt.UserRole, new_name)
             except Exception:
                 pass
 
@@ -897,7 +905,19 @@ class PdfProcessorApp(QtWidgets.QMainWindow, SessionManagerUI):
             new_name = f"dokument_do_weryfikacji_{row+1}.pdf"
 
         self.tree.blockSignals(True)
-        self.tree.setItem(row, 2, QtWidgets.QTableWidgetItem(new_name))
+        current_item = self.tree.item(row, 2)
+        current_actual = None
+        if current_item is not None:
+            current_actual = current_item.data(QtCore.Qt.UserRole)
+
+        new_item = QtWidgets.QTableWidgetItem(new_name)
+        if current_actual:
+            try:
+                new_item.setData(QtCore.Qt.UserRole, current_actual)
+            except Exception:
+                pass
+
+        self.tree.setItem(row, 2, new_item)
         for offset, key in enumerate(self.info_keys, start=3):
             value = info.get(key, "")
             self.tree.setItem(row, offset, QtWidgets.QTableWidgetItem(value))
@@ -923,6 +943,198 @@ class PdfProcessorApp(QtWidgets.QMainWindow, SessionManagerUI):
                     cell = self.tree.item(row, col_idx)
                     if cell:
                         cell.setBackground(QtGui.QColor(color))
+
+
+    def _apply_new_names(self) -> None:
+        """Rename copied files so they match the edited "Nowa nazwa" column."""
+
+        if not hasattr(self, "tree"):
+            return
+
+        target_root = self.output_dir or self.input_dir
+        if not target_root:
+            try:
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Brak katalogu",
+                    "Najpierw wybierz katalog wejściowy lub wynikowy.",
+                )
+            except Exception:
+                pass
+            return
+
+        target_dir = Path(target_root)
+        if not target_dir.exists():
+            try:
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Brak katalogu",
+                    f"Katalog '{target_root}' nie istnieje.",
+                )
+            except Exception:
+                pass
+            return
+
+        if not hasattr(self.tree, "rowCount"):
+            return
+
+        row_count = self.tree.rowCount()
+        if row_count == 0:
+            return
+
+        if hasattr(self, "rename_btn"):
+            self.rename_btn.setEnabled(False)
+
+        errors: list[str] = []
+        renamed = 0
+
+        try:
+            existing_names: set[str] = set()
+            for row in range(row_count):
+                item = self.tree.item(row, 2)
+                if item is None:
+                    continue
+                current_name = item.data(QtCore.Qt.UserRole) or item.text()
+                if current_name:
+                    existing_names.add(str(current_name).lower())
+
+            for row in range(row_count):
+                name_item = self.tree.item(row, 0)
+                new_item = self.tree.item(row, 2)
+                if name_item is None or new_item is None:
+                    continue
+
+                original_display = name_item.text() or ""
+                original_name = original_display.split(" -> ")[0]
+                desired_raw = (new_item.text() or "").strip()
+                if not desired_raw:
+                    continue
+
+                desired_name = Path(desired_raw).name
+                desired_name = re.sub(r"[^\w.-]", "_", desired_name, flags=re.ASCII)
+                desired_name = DISALLOWED_CHARS.sub("_", desired_name)
+
+                current_actual = (
+                    new_item.data(QtCore.Qt.UserRole)
+                    or name_item.data(QtCore.Qt.UserRole + 1)
+                    or original_name
+                )
+                current_actual = Path(str(current_actual)).name
+                current_lower = current_actual.lower()
+                if not current_actual:
+                    errors.append(
+                        f"Wiersz {row + 1}: brak informacji o aktualnej nazwie pliku."
+                    )
+                    continue
+                if current_lower:
+                    existing_names.discard(current_lower)
+
+                extension = Path(original_name).suffix
+                if not extension:
+                    extension = (
+                        Path(current_actual).suffix or Path(desired_raw).suffix or ".pdf"
+                    )
+                if not Path(desired_name).suffix and extension:
+                    desired_name = f"{desired_name}{extension}"
+                desired_name = Path(desired_name).name
+                desired_name = re.sub(r"[^\w.-]", "_", desired_name, flags=re.ASCII)
+                desired_name = DISALLOWED_CHARS.sub("_", desired_name)
+
+                desired_lower = desired_name.lower()
+                if not desired_name:
+                    if current_lower:
+                        existing_names.add(current_lower)
+                    errors.append(
+                        f"Wiersz {row + 1}: brak poprawnej nazwy docelowej."
+                    )
+                    continue
+
+                source_path = target_dir / current_actual
+                if desired_lower == current_lower or not source_path.exists():
+                    if not source_path.exists():
+                        errors.append(
+                            f"Wiersz {row + 1}: plik '{current_actual}' nie został znaleziony."
+                        )
+                    existing_names.add(current_lower or desired_lower)
+                    if desired_name != new_item.text():
+                        self.tree.blockSignals(True)
+                        new_item.setText(desired_name)
+                        self.tree.blockSignals(False)
+                    continue
+
+                if desired_lower in existing_names:
+                    errors.append(
+                        f"Wiersz {row + 1}: nazwa '{desired_name}' jest już używana."
+                    )
+                    existing_names.add(current_lower)
+                    continue
+
+                destination_path = target_dir / desired_name
+                if destination_path.exists():
+                    errors.append(
+                        f"Wiersz {row + 1}: plik '{desired_name}' już istnieje w katalogu."
+                    )
+                    existing_names.add(current_lower)
+                    continue
+
+                try:
+                    source_path.rename(destination_path)
+                except Exception as exc:
+                    errors.append(
+                        f"Wiersz {row + 1}: nie udało się zmienić nazwy '{current_actual}' -> '{desired_name}': {exc}"
+                    )
+                    existing_names.add(current_lower)
+                    continue
+
+                renamed += 1
+                existing_names.add(desired_lower)
+
+                self.tree.blockSignals(True)
+                new_item.setText(desired_name)
+                new_item.setData(QtCore.Qt.UserRole, desired_name)
+                name_item.setText(f"{original_name} -> {desired_name}")
+                name_item.setData(QtCore.Qt.UserRole + 1, desired_name)
+                self.tree.blockSignals(False)
+
+                if row == self.tree.currentRow():
+                    self._update_preview()
+        finally:
+            if hasattr(self, "rename_btn"):
+                self.rename_btn.setEnabled(True)
+
+        if renamed and not errors:
+            try:
+                QtWidgets.QMessageBox.information(
+                    self,
+                    "Zmiana nazw",
+                    f"Zmieniono nazwy {renamed} plików.",
+                )
+            except Exception:
+                pass
+            return
+
+        if errors:
+            message = "\n".join(errors[:5])
+            if len(errors) > 5:
+                message += f"\n… oraz {len(errors) - 5} kolejnych błędów."
+            try:
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Zmiana nazw",
+                    message if renamed else f"Nie dokonano zmian.\n{message}",
+                )
+            except Exception:
+                pass
+        elif not renamed:
+            try:
+                QtWidgets.QMessageBox.information(
+                    self,
+                    "Zmiana nazw",
+                    "Nie było zmian do zastosowania.",
+                )
+            except Exception:
+                pass
+
 
     def add_file(self) -> None:
         """Append a single PDF file to the table."""
