@@ -9,7 +9,7 @@ import logging
 import gc
 from typing import Any, Dict, List, Optional, Union
 
-# bitsandbytes i konfiguracja kwantyzacji są opcjonalne
+# bitsandbytes and quantization configuration are optional
 try:
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig  # type: ignore
     BNB_AVAILABLE = True
@@ -30,73 +30,73 @@ except Exception:  # pragma: no cover - transformers unavailable
             def from_pretrained(cls, *_, **__):  # pragma: no cover - stub
                 raise RuntimeError("transformers not installed")
 
-# Import analizatora kontekstowego
+# Import contextual analyzer
 from context_analyzer import ContextAwareDocumentAnalyzer
 
-# Konfiguracja logowania
+# Logging configuration
 logger = logging.getLogger(__name__)
 
-# Proste cache modeli i tokenizerów
+# Simple cache for models and tokenizers
 MODEL_CACHE: Dict[str, Any] = {}
 TOKENIZER_CACHE: Dict[str, Any] = {}
 
-# Domyślny prompt do sugerowania poprawek
+# Default prompt for suggesting corrections
 DEFAULT_CORRECTION_PROMPT = (
     "<|system|>\n"
-    "Jesteś ekspertem w analizie dokumentów i korekcie danych. Przeanalizuj podane informacje i zaproponuj poprawki, jeśli zauważysz błędy.\n\n"
-    "Masz:\n"
-    "1. Wyciągnięte metadane dokumentu, które mogą zawierać błędy\n"
-    "2. Fragment oryginalnego tekstu dokumentu\n\n"
-    "Twoim zadaniem jest:\n"
-    "1. Sprawdzić, czy metadane są poprawne w kontekście oryginalnego tekstu\n"
-    "2. Zaproponować poprawki do metadanych, jeśli są nieprawidłowe\n"
-    "3. Zwrócić poprawione metadane\n\n"
-    "Zwróć szczególną uwagę na:\n"
-    "- Poprawność formatu daty (YYYY-MM-DD)\n"
-    "- Precyzyjne określenie typu dokumentu\n"
-    "- Właściwe zidentyfikowanie nadawcy/odbiorcy\n"
-    "- Trafne określenie tematu dokumentu\n\n"
-    "Zwróć odpowiedź TYLKO w formacie JSON:\n"
+    "You are an expert in document analysis and data correction. Analyze the provided information and suggest corrections if you notice errors.\n\n"
+    "You have:\n"
+    "1. Extracted document metadata, which may contain errors\n"
+    "2. A fragment of the original document text\n\n"
+    "Your task is to:\n"
+    "1. Check if the metadata is correct in the context of the original text\n"
+    "2. Suggest corrections to the metadata if they are incorrect\n"
+    "3. Return corrected metadata\n\n"
+    "Pay special attention to:\n"
+    "- Correctness of date format (YYYY-MM-DD)\n"
+    "- Precise determination of document type\n"
+    "- Proper identification of sender/recipient\n"
+    "- Accurate determination of document subject\n\n"
+    "Return response ONLY in JSON format:\n"
     "{{\n"
-    "  \"typ_dokumentu\": \"SKORYGOWANY_TYP\",\n"
-    "  \"data\": \"SKORYGOWANA_DATA\",\n"
-    "  \"nadawca_odbiorca\": \"SKORYGOWANY_NADAWCA\",\n"
-    "  \"temat\": \"SKORYGOWANY_TEMAT\",\n"
-    "  \"numer_dokumentu\": \"SKORYGOWANY_NUMER\"\n"
+    "  \"typ_dokumentu\": \"CORRECTED_TYPE\",\n"
+    "  \"data\": \"CORRECTED_DATE\",\n"
+    "  \"nadawca_odbiorca\": \"CORRECTED_SENDER\",\n"
+    "  \"temat\": \"CORRECTED_SUBJECT\",\n"
+    "  \"numer_dokumentu\": \"CORRECTED_NUMBER\"\n"
     "}}\n"
     "<|user|>\n"
-    "Wyciągnięte metadane:\n"
-    "Typ dokumentu: {typ_dokumentu}\n"
-    "Data: {data}\n"
-    "Nadawca/Odbiorca: {nadawca_odbiorca}\n"
-    "Temat: {w_sprawie}\n"
-    "Numer dokumentu: {numer_dokumentu}\n\n"
-    "Fragment oryginalnego tekstu:\n"
+    "Extracted metadata:\n"
+    "Document type: {typ_dokumentu}\n"
+    "Date: {data}\n"
+    "Sender/Recipient: {nadawca_odbiorca}\n"
+    "Subject: {w_sprawie}\n"
+    "Document number: {numer_dokumentu}\n\n"
+    "Fragment of original text:\n"
     "{ocr_text}\n"
     "<|assistant|>"
 )
 
 class DocumentLLMProcessor:
-    """Klasa do inteligentnego przetwarzania treści dokumentów przy użyciu małych LLM"""
+    """Class for intelligent processing of document content using small LLMs"""
     
     AVAILABLE_MODELS = {
         "phi-3-mini": {
             "model_id": "microsoft/phi-3-mini-128k-instruct",
             "context_length": 128000,
             "name": "Microsoft Phi-3 Mini",
-            "description": "Mały model generatywny z Microsoft AI (2024)"
+            "description": "Small generative model from Microsoft AI (2024)"
         },
         "phi-2": {
             "model_id": "microsoft/phi-2",
             "context_length": 4096,
             "name": "Microsoft Phi-2", 
-            "description": "Mniejszy i szybszy model Microsoft, lepszy na CPU (2023)"
+            "description": "Smaller and faster Microsoft model, better on CPU (2023)"
         },
         "mistral-tiny": {
             "model_id": "mistralai/Mistral-7B-Instruct-v0.2",
             "context_length": 8192,
             "name": "Mistral 7B Instruct",
-            "description": "Dobra równowaga między rozmiarem a wydajnością (2023)"
+            "description": "Good balance between size and performance (2023)"
         }
     }
     
@@ -111,15 +111,15 @@ class DocumentLLMProcessor:
         self.selected_model = selected_model if selected_model in self.AVAILABLE_MODELS else "phi-2"
         self.model_info = self.AVAILABLE_MODELS[self.selected_model]
         
-        # Sprawdź zarówno nowy format ścieżki (llm_model_phi-2), jak i stary (llm_model)
+        # Check both new path format (llm_model_phi-2) and old format (llm_model)
         base_dir = os.path.dirname(os.path.abspath(__file__))
         self.model_dir = os.path.join(base_dir, f"llm_model_{self.selected_model}")
         
-        # Dla kompatybilności wstecznej - sprawdzenie starej lokalizacji dla phi-3-mini
+        # For backward compatibility - check old location for phi-3-mini
         if selected_model == "phi-3-mini" and not os.path.exists(self.model_dir):
             legacy_dir = os.path.join(base_dir, "llm_model")
             if os.path.exists(legacy_dir):
-                logger.info(f"Używanie modelu z lokalizacji starego typu: {legacy_dir}")
+                logger.info(f"Using model from legacy location: {legacy_dir}")
                 self.model_dir = legacy_dir
         
         self.model_id = self.model_info["model_id"]
@@ -129,11 +129,11 @@ class DocumentLLMProcessor:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self.device = "cpu"
-        # czy używać kwantyzacji: True/False/"auto"
+        # whether to use quantization: True/False/"auto"
         self.use_quantization = use_quantization
         self.loaded = False
 
-        # Załaduj konfigurację promptów
+        # Load prompt configuration
         prompts_path = os.path.join(base_dir, "prompts.json")
         try:
             with open(prompts_path, "r", encoding="utf-8") as f:
@@ -144,7 +144,7 @@ class DocumentLLMProcessor:
         # Inicjalizacja analizatora kontekstowego
         self.context_analyzer = ContextAwareDocumentAnalyzer(prompts=self.prompts)
 
-        logger.info(f"Inicjalizacja asystenta LLM - model: {self.model_info['name']} (urządzenie: {self.device})")
+        logger.info(f"Initializing LLM assistant - model: {self.model_info['name']} (device: {self.device})")
     
     def is_model_downloaded(self) -> bool:
         """Check whether model files are present on disk."""

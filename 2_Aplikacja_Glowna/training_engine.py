@@ -15,10 +15,10 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import shutil
 
-# Konfiguracja logowania
+# Logging configuration
 logger = logging.getLogger(__name__)
 
-# --- Konfiguracja Ścieżek ---
+# --- Path Configuration ---
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
 else:
@@ -67,7 +67,7 @@ def detect_document_type(text: str) -> Tuple[Optional[str], Optional[int], Optio
 
 
 def run_cpp_ocr(pdf_paths: List[str]) -> List[str]:
-    """Wywołuje moduł C++ do równoległego OCR."""
+    """Calls the C++ module for parallel OCR."""
     exe_path = os.path.join(base_path, "training_ocr")
 
     def _worker(paths):
@@ -191,7 +191,7 @@ def convert_to_spacy_format(jsonl_path: str, train_path: str, dev_path: str) -> 
         db.to_disk(output_path)
 
 def run_training_pipeline(data_folder_path: str, output_model_path: str, log_callback: Callable[[str], None]) -> bool:
-    """Główna funkcja uruchamiająca cały proces treningu."""
+    """Main function that runs the entire training process."""
     try:
         # Krok 1: Przygotuj dane
         jsonl_file = create_training_data_from_sheets(data_folder_path, log_callback)

@@ -13,7 +13,7 @@ import pytesseract
 
 # --- Path Configuration ---
 # Assume Tesseract and Poppler are in the main application folder
-base_app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '2_Aplikacja_Główna'))
+base_app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '2_Aplikacja_Glowna'))
 tesseract_folder = os.path.join(base_app_path, "tesseract")
 poppler_folder = os.path.join(base_app_path, "poppler", "bin")
 tesseract_cmd = os.path.join(tesseract_folder, 'tesseract.exe')
@@ -137,14 +137,14 @@ if __name__ == "__main__":
         sys.exit(1)
 
     input_data_folder = sys.argv[1]
-    output_jsonl_file = os.path.join("dane_wyjściowe_z_doccano", "trening_z_rozpisek.jsonl")
+    output_jsonl_file = os.path.join("dane_wyjsciowe_z_doccano", "trening_z_rozpisek.jsonl")
 
     if not os.path.isdir(input_data_folder):
         print(f"Error: Input folder '{input_data_folder}' does not exist.")
         sys.exit(1)
         
-    if not os.path.exists("dane_wyjściowe_z_doccano"):
-        os.makedirs("dane_wyjściowe_z_doccano")
+    if not os.path.exists("dane_wyjsciowe_z_doccano"):
+        os.makedirs("dane_wyjsciowe_z_doccano")
 
     process_directory(input_data_folder, output_jsonl_file)
 
