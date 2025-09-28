@@ -17,13 +17,13 @@ The project is organized in a modular manner to separate development tools from 
 
 ```
 archiwizacja-IGG-helper/
-├── 1_Narzędzia_Treningowe/       # Scripts and data for training the model
+├── 1_Narzedzia_Treningowe/       # Scripts and data for training the model
 │   ├── konwertuj_pdf_do_txt.py # PDF -> TXT converter
 │   ├── trenuj_model.py         # Main training script
 │   ├── base_config.cfg         # spaCy configuration template
 │   └── README.md               # Training instructions
 │
-├── 2_Aplikacja_Główna/           # Source code of the final application
+├── 2_Aplikacja_Glowna/           # Source code of the final application
 │   ├── app.py                  # Main application file
 │   ├── moj_model_ner/          # Location for the trained model
 │   ├── poppler/                # Library for PDF handling
@@ -36,14 +36,14 @@ archiwizacja-IGG-helper/
 
 ## 3. Model Training Process
 
-The model should be retrained periodically to improve its effectiveness or adapt to new document types. The process takes place in the `1_Narzędzia_Treningowe` folder.
+The model should be retrained periodically to improve its effectiveness or adapt to new document types. The process takes place in the `1_Narzedzia_Treningowe` folder.
 
 ### Phase 1: Data Preparation
 
 1.  **Collect data:** Gather 50–100 representative PDF files. The more variety, the better.
 2.  **Convert to TXT:** Use the `konwertuj_pdf_do_txt.py` script to batch convert PDFs into plain text.
     ```bash
-    # Będąc w folderze 1_Narzędzia_Treningowe/
+    # Being in the 1_Narzedzia_Treningowe/ folder
     python konwertuj_pdf_do_txt.py "C:\Sciezka\Do\Twoich\PDFow" "dane_do_etykietowania"
     ```
 
@@ -68,22 +68,22 @@ The model should be retrained periodically to improve its effectiveness or adapt
     *   `TYTUL_PISMA` (subject or title, e.g., "Payment Demand")
     *   `NR_DOKUMENTU` (other identifiers, e.g., reference number)
 4.  **Import and label:** Import `.txt` files and mark the spans corresponding to the defined labels.
-5.  **Export:** After labeling, export the data in **`JSONL (spaCy)`** format and save the file in the `dane_wyjściowe_z_doccano/` folder.
+5.  **Export:** After labeling, export the data in **`JSONL (spaCy)`** format and save the file in the `dane_wyjsciowe_z_doccano/` folder.
 
 ### Phase 3: Training
 
 1.  **Generate configuration:** If `config.cfg` does not exist, it will be created from `base_config.cfg`.
     ```bash
-    # (Opcjonalne, skrypt trenujący robi to automatycznie)
+    # (Optional, training script does this automatically)
     python -m spacy init fill-config base_config.cfg config.cfg
     ```
 2.  **Run the training script:**
     ```bash
-    # Będąc w folderze 1_Narzędzia_Treningowe/
+    # Being in the 1_Narzedzia_Treningowe/ folder
     python trenuj_model.py
     ```
     The script automatically splits the data into training and development sets and then starts the training process.
-3.  **Retrieve the model:** The best version of the trained model is saved in `model_wyjściowy/model-best/`.
+3.  **Retrieve the model:** The best version of the trained model is saved in `model_wyjsciowy/model-best/`.
 
 ## 4. Building the Application (.exe)
 
@@ -94,8 +94,8 @@ After successful training, you can build a standalone executable.
 - [Zig](https://ziglang.org/download/) – compiler used to build the OCR module
 - [PyInstaller](https://pyinstaller.org/en/stable/) – tool for packaging the application
 
-1.  **Copy the model:** Move the entire contents of `model_wyjściowy/model-best/` to `2_Aplikacja_Główna/moj_model_ner/`.
-2.  **Run PyInstaller:** Navigate to the `2_Aplikacja_Główna/` folder and execute:
+1.  **Copy the model:** Move the entire contents of `model_wyjsciowy/model-best/` to `2_Aplikacja_Glowna/moj_model_ner/`.
+2.  **Run PyInstaller:** Navigate to the `2_Aplikacja_Glowna/` folder and execute:
     ```bash
       pyinstaller --noconsole --onefile --name "Archiwizator" --add-data "tesseract;tesseract" --add-data "poppler;poppler" --add-data "moj_model_ner;moj_model_ner" app.py
     ```
