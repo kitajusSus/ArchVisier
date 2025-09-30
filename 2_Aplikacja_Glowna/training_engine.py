@@ -15,10 +15,10 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 import shutil
 
-# Konfiguracja logowania
+# Logging configuration
 logger = logging.getLogger(__name__)
 
-# --- Konfiguracja Ścieżek ---
+# --- Path Configuration ---
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
 else:
@@ -67,7 +67,7 @@ def detect_document_type(text: str) -> Tuple[Optional[str], Optional[int], Optio
 
 
 def run_cpp_ocr(pdf_paths: List[str]) -> List[str]:
-    """Wywołuje moduł C++ do równoległego OCR."""
+    """Calls the C++ module for parallel OCR."""
     exe_path = os.path.join(base_path, "training_ocr")
 
     def _worker(paths):
@@ -101,7 +101,7 @@ def create_training_data_from_sheets(input_dir: str, log_callback: Callable[[str
         try:
             df = pd.read_excel(xlsx_path)
         except Exception as e:
-            log_callback(f"!! Błąd odczytu pliku Excel: {e}")
+            log_callback(f"!! Error reading Excel file: {e}")
             continue
 
         pdf_entries = []
@@ -112,7 +112,7 @@ def create_training_data_from_sheets(input_dir: str, log_callback: Callable[[str
 
             pdf_path = os.path.join(root, pdf_filename)
             if not os.path.exists(pdf_path):
-                log_callback(f"!! Ostrzeżenie: Plik PDF '{pdf_filename}' nie został znaleziony.")
+                log_callback(f"!! Warning: PDF file '{pdf_filename}' was not found.")
                 continue
 
             pdf_entries.append((row, pdf_filename, pdf_path))
@@ -123,7 +123,7 @@ def create_training_data_from_sheets(input_dir: str, log_callback: Callable[[str
             try:
                 texts = run_cpp_ocr(pdf_paths)
             except Exception as e:
-                log_callback(f"  !! Błąd OCR w module C++: {e}")
+                log_callback(f"  !! OCR error in C++ module: {e}")
                 texts = ["" for _ in pdf_paths]
 
         for (row, pdf_filename, pdf_path), full_text in zip(pdf_entries, texts):
@@ -148,7 +148,7 @@ def create_training_data_from_sheets(input_dir: str, log_callback: Callable[[str
                 training_data.append({"text": full_text, "label": entities})
 
     if not training_data:
-        log_callback("Nie znaleziono żadnych danych do treningu.")
+        log_callback("No training data found.")
         return None
 
     # Zapisz do tymczasowego pliku JSONL
@@ -158,7 +158,7 @@ def create_training_data_from_sheets(input_dir: str, log_callback: Callable[[str
             json.dump(entry, f, ensure_ascii=False)
             f.write('\n')
     
-    log_callback(f"\n>>> Zakończono! Zapisano {len(training_data)} rekordów treningowych.")
+    log_callback(f"\n>>> Completed! Saved {len(training_data)} training records.")
     return output_jsonl_file
 
 def convert_to_spacy_format(jsonl_path: str, train_path: str, dev_path: str) -> None:
@@ -185,13 +185,13 @@ def convert_to_spacy_format(jsonl_path: str, train_path: str, dev_path: str) -> 
                 doc.ents = ents
                 db.add(doc)
             except ValueError:
-                pass # Ignoruj błędy, jeśli encje się nakładają
+                pass # Ignore errors if entities overlap
         
         output_path = train_path if dataset_type == "train" else dev_path
         db.to_disk(output_path)
 
 def run_training_pipeline(data_folder_path: str, output_model_path: str, log_callback: Callable[[str], None]) -> bool:
-    """Główna funkcja uruchamiająca cały proces treningu."""
+    """Main function that runs the entire training process."""
     try:
         # Krok 1: Przygotuj dane
         jsonl_file = create_training_data_from_sheets(data_folder_path, log_callback)
@@ -206,7 +206,7 @@ def run_training_pipeline(data_folder_path: str, output_model_path: str, log_cal
         
         log_callback("\nKonwertowanie danych do formatu spaCy...")
         convert_to_spacy_format(jsonl_file, train_spacy_path, dev_spacy_path)
-        log_callback("Konwersja zakończona.")
+        log_callback("Conversion completed.")
 
         # Krok 3: Przygotuj plik konfiguracyjny
         config_path = os.path.join(temp_dir, "config.cfg")
@@ -280,9 +280,9 @@ path = ${paths.train}
             "paths.dev": dev_spacy_path,
         })
         
-        log_callback(f"\nTrening zakończony! Najlepszy model zapisano w: {os.path.join(output_model_path, 'model-best')}")
-        
-        # Sprzątanie plików tymczasowych
+        log_callback(f"\nTraining completed! Best model saved in: {os.path.join(output_model_path, 'model-best')}")
+
+        # Cleanup temporary files
         os.remove(jsonl_file)
         shutil.rmtree(temp_dir)
         

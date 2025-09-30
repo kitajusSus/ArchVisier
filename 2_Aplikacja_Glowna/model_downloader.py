@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class ModelDownloaderWorker(QtCore.QThread):
-    """Wątek odpowiedzialny za pobieranie i zapisywanie modelu."""
+    """Thread responsible for downloading and saving the model."""
 
     log_signal = QtCore.Signal(str, str)
     status_signal = QtCore.Signal(str)
@@ -30,10 +30,10 @@ class ModelDownloaderWorker(QtCore.QThread):
         self.model_info = model_info
         self.model_dir = model_dir
 
-    def run(self) -> None:  # pragma: no cover - uruchamiane w wątku GUI
+    def run(self) -> None:  # pragma: no cover - runs in GUI thread
         try:
             self.status_signal.emit(
-                f"Pobieranie modelu {self.model_info['name']}... (może potrwać kilka minut)"
+                f"Downloading model {self.model_info['name']}... (may take a few minutes)"
             )
             self.log_signal.emit(
                 f"Rozpoczynam pobieranie modelu: {self.model_info['name']}", "info"

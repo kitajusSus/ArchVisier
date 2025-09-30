@@ -61,7 +61,7 @@ except Exception:  # pragma: no cover - fallback stub
         def get_sentence_embedding_dimension(self) -> int:
             return self._dim
 
-# Opcjonalna szybka implementacja podobieństwa kosinusowego
+# Optional fast cosine similarity implementation
 try:
     from fast_similarity import cosine_similarity as fast_cosine
 except Exception:  # pragma: no cover - pure Python fallback
@@ -71,40 +71,40 @@ except Exception:  # pragma: no cover - pure Python fallback
         nb = sum(y * y for y in b) ** 0.5
         return 0.0 if na == 0.0 or nb == 0.0 else dot / (na * nb)
 
-# Konfiguracja logowania
+# Logging configuration
 logger = logging.getLogger(__name__)
 
 class ContextAwareDocumentAnalyzer:
-    """System analizy dokumentów z uwzględnieniem kontekstu i historii poprawek"""
+    """Document analysis system with context and correction history awareness"""
 
     SIMILARITY_THRESHOLD = 0.7
 
     DEFAULT_METADATA_PROMPT = (
         "<|system|>\n"
-        "Jesteś ekspertem w analizie dokumentów prawnych i biznesowych. Twoim zadaniem jest szczegółowa analiza fragmentu dokumentu i wyciągnięcie z niego najważniejszych metadanych.\n\n"
-        "Przeanalizuj dokument i wyciągnij następujące informacje:\n"
-        "1. TYP DOKUMENTU (np. umowa, faktura, protokół, porozumienie, odbiór, aneks, wezwanie, oświadczenie)\n"
-        "2. DATA dokumentu (w formacie YYYY-MM-DD kiedy został wystawiony lub podpisany, jeśli jest podana w różnych formatach, wybierz najbardziej prawdopodobną)\n"
-        "3. NADAWCA/ODBIORCA (nazwa firmy lub instytucji lub osoby fizycznej, która wystawia lub otrzymuje dokument)\n"
-        "4. TEMAT dokumentu (krótki opis czego dotyczy)\n"
-        "5. NUMER DOKUMENTU (np. nr umowy, nr faktury, sygnatura) jeśli występuje"
+        "You are an expert in legal and business document analysis. Your task is detailed analysis of a document fragment and extraction of the most important metadata from it.\n\n"
+        "Analyze the document and extract the following information:\n"
+        "1. DOCUMENT TYPE (e.g., contract, invoice, protocol, agreement, receipt, amendment, notice, statement)\n"
+        "2. DOCUMENT DATE (in YYYY-MM-DD format when it was issued or signed, if given in different formats, choose the most probable one)\n"
+        "3. SENDER/RECIPIENT (name of company or institution or individual who issues or receives the document)\n"
+        "4. DOCUMENT SUBJECT (brief description of what it concerns)\n"
+        "5. DOCUMENT NUMBER (e.g., contract no., invoice no., signature) if present"
         "{similar_examples}\n\n"
-        "Zwróć wyniki WYŁĄCZNIE w formacie JSON, nic poza tym. Format:\n"
+        "Return results ONLY in JSON format, nothing else. Format:\n"
         "{{\n"
-        "  \"typ_dokumentu\": \"OKREŚLONY_TYP\",\n"
+        "  \"typ_dokumentu\": \"DETERMINED_TYPE\",\n"
         "  \"data\": \"YYYY-MM-DD\",\n"
-        "  \"nadawca_odbiorca\": \"NAZWA\",\n"
-        "  \"temat\": \"OPIS\",\n"
-        "  \"numer_dokumentu\": \"NR/SYG\"\n"
+        "  \"nadawca_odbiorca\": \"NAME\",\n"
+        "  \"temat\": \"DESCRIPTION\",\n"
+        "  \"numer_dokumentu\": \"NO/SIG\"\n"
         "}}\n\n"
-        "Analizując dokument:\n"
-        "- Zwracaj szczególną uwagę na kontekst i znaczenie treści\n"
-        "- Zrozum cel i charakter dokumentu\n"
-        "- Postaraj się zidentyfikować kluczowe informacje nawet jeśli są sformułowane nietypowo\n"
-        "- Znajdź datę w różnych formatach i przekształć ją do formatu YYYY-MM-DD\n"
-        "- Określ typ dokumentu na podstawie jego struktury i treści\n"
-        "- Jeśli dokument zawiera wiele dat, wybierz tę, która najprawdopodobniej jest datą dokumentu\n\n"
-        "Jeśli jakaś informacja nie występuje w tekście, użyj pustego ciągu \"\" dla danego pola.\n"
+        "When analyzing the document:\n"
+        "- Pay special attention to context and meaning of content\n"
+        "- Understand the purpose and nature of the document\n"
+        "- Try to identify key information even if formulated unusually\n"
+        "- Find dates in various formats and convert them to YYYY-MM-DD format\n"
+        "- Determine document type based on its structure and content\n"
+        "- If the document contains multiple dates, choose the one that is most likely the document date\n\n"
+        "If any information does not appear in the text, use an empty string \"\" for that field.\n"
         "<|user|>\n"
         "{document_text}\n"
         "<|assistant|>"

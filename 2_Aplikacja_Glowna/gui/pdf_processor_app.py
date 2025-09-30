@@ -83,9 +83,9 @@ class _DummySignal:
 logger = logging.getLogger(__name__)
 
 
-# Kolumny odpowiadające danym zwracanym przez ``extract_info_from_text``.
-# Pierwszy element to klucz w słowniku z informacjami, drugi – etykieta
-# wyświetlana w tabeli oraz w eksporcie.
+# Columns corresponding to data returned by ``extract_info_from_text``.
+# First element is the key in the dictionary with information, second - label
+# displayed in table and in export.
 INFO_FIELDS = [
     ("data", "Data"),
     ("nadawca_odbiorca", "Nadawca/Odbiorca"),

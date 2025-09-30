@@ -19,7 +19,7 @@ def log(message: str) -> None:
 def main() -> int:
     """Entry point for launching the training pipeline as a subprocess."""
     if len(sys.argv) < 3:
-        print("Brak wymaganych argumentów", flush=True)
+        print("Missing required arguments", flush=True)
         return 1
     data_folder = sys.argv[1]
     output_model_dir = sys.argv[2]

@@ -36,14 +36,14 @@ def main() -> None:
         "process", help="Wykonaj OCR na plikach PDF"
     )
     process_parser.add_argument(
-        "pdf_paths", nargs="+", help="Ścieżki do plików PDF do przetworzenia"
+        "pdf_paths", nargs="+", help="Paths to PDF files to process"
     )
     process_parser.add_argument(
         "-l",
         "--language",
         default="pol",
         choices=["pol", "eng", "auto"],
-        help="Język OCR (pol, eng, auto)",
+        help="OCR language (pol, eng, auto)",
     )
 
     args = parser.parse_args()

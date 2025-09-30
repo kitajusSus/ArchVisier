@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 class SmartExtractor:
     """
-    Klasa do inteligentnej ekstrakcji danych z tekstu przy użyciu prostych metod opartych na regułach.
-    Służy jako rozwiązanie uzupełniające lub awaryjne gdy NER lub LLM nie są dostępne.
+    Class for intelligent data extraction from text using simple rule-based methods.
+    Serves as a complementary or fallback solution when NER or LLM are not available.
     """
     
     def __init__(self, nlp_model: Any = None) -> None:
@@ -22,7 +22,7 @@ class SmartExtractor:
         Args:
             nlp_model: Optional spaCy model used for fallback NER.
         """
-        # Słowniki typów dokumentów do rozpoznawania (z wariantami wielojęzycznymi)
+        # Document type dictionaries for recognition (with multilingual variants)
         self.document_types = {
             "umowa": "UMOWA",
             "porozumienie": "POROZUMIENIE",
@@ -66,7 +66,7 @@ class SmartExtractor:
             "oswiadczenie": "OŚWIADCZENIE",
         }
 
-        # Inicjalizacja wzorców dla różnych typów informacji
+        # Initialize patterns for different types of information
         self._init_patterns()
 
         # Opcjonalny model spaCy do fallbacku NER
@@ -75,7 +75,7 @@ class SmartExtractor:
             try:
                 self.nlp = spacy.load("pl_core_news_sm")
             except Exception:
-                logger.warning("Nie udało się załadować modelu spaCy. Fallback NER będzie niedostępny.")
+                logger.warning("Failed to load spaCy model. Fallback NER will be unavailable.")
                 self.nlp = None
         
     def _init_patterns(self) -> None:

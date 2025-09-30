@@ -1,7 +1,7 @@
 DOC_TYPE_LABELS = {
-    "KP": "Korespondencja Przychodząca (KP)",
-    "KW": "Korespondencja Wychodząca (KW)",
-    "SA": "Sąd Arbitrażowy (SA)",
+    "KP": "Korespondencja Przychodzaca (KP)",
+    "KW": "Korespondencja Wychodzaca (KW)",
+    "SA": "Sad Arbitrazowy (SA)",
 }
 
 LABEL_TO_CODE = {label: code for code, label in DOC_TYPE_LABELS.items()}

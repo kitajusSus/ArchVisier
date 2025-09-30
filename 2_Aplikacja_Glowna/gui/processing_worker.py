@@ -59,16 +59,16 @@ except Exception:  # pragma: no cover - minimal stub
 
 logger = logging.getLogger(__name__)
 
-# --- Konfiguracja Ścieżek (dla trybu normalnego i .exe) ---
+# --- Path Configuration (for normal mode and .exe) ---
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
-    # W trybie .exe, katalogiem nadrzędnym jest katalog, w którym znajduje się .exe
+    # In .exe mode, the parent directory is the directory where the .exe is located
     app_dir = os.path.dirname(sys.executable)
 else:
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     app_dir = os.path.dirname(base_path)
 
-# Upewnij się, że moduł SmartExtractor jest dostępny w ścieżce
+# Ensure that the SmartExtractor module is available in the path
 if base_path not in sys.path:
     sys.path.insert(0, base_path)
 

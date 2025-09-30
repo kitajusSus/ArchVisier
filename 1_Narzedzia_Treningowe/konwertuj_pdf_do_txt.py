@@ -8,7 +8,7 @@ from pdf2image import convert_from_path
 import pytesseract
 
 # Configure paths relative to the project structure
-base_app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '2_Aplikacja_Główna'))
+base_app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '2_Aplikacja_Glowna'))
 tesseract_folder = os.path.join(base_app_path, "tesseract")
 poppler_folder = os.path.join(base_app_path, "poppler", "bin")
 tesseract_cmd = os.path.join(tesseract_folder, "tesseract.exe")
